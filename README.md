@@ -15,3 +15,6 @@ Használat:
  - effekt névre klikkelve megjelennek előtted
  - E billentyűvel  lekerül a fókusz és mozoghatsz, de NUI és az effektek maradnak
  - BEZÁR gombbal, az effektek törlésre kerülnek, NUI felület eltűnik
+
+![eco_effect1](https://github.com/Ekhion76/eco_effect/blob/main/previews/eco_effect1.png)
+![eco_effect2](https://github.com/Ekhion76/eco_effect/blob/main/previews/eco_effect2.png)
