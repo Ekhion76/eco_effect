@@ -4,7 +4,7 @@ GTAV Fivem fejlesztői szkript effektek keresésére
 :pencil2: Tutya Discord elérhetősége (fejlesztő): HipnotikusAvasSzalonna#3252
 
 Funkciók:
- - ha rákattintasz egy effekt névre, az assest-et és a nevet-ot vágólapra másolja, neked már csak CTRL+V-t kell nyomj, hogy a szkriptedbe beilleszd.
+ - effektre kattintva az assest-et és a nevet vágólapra másolja
  - kereső
  - Alexguirre féle listát használja 
  - Az ablak áthelyezhető
