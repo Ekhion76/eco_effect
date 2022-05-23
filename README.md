@@ -1,5 +1,5 @@
 # eco_effect
-Fejlesztői szkript effektek keresésére
+GTAV Fivem fejlesztői szkript effektek keresésére
 
 :pencil2: Tutya Discord elérhetősége (fejlesztő): HipnotikusAvasSzalonna#3252
 
