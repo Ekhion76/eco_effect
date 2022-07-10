@@ -3,7 +3,7 @@
 
 VIDEO:
 
-[![promo_video](https://img.youtube.com/vi/mbmae0rCMHU/0.jpg)](https://youtu.be/mbmae0rCMHU){:target="\_blank"}
+<a href="https://youtu.be/mbmae0rCMHU" target="_blank">![promo_video](https://img.youtube.com/vi/mbmae0rCMHU/0.jpg)</a>
 
 Discord: https://discord.gg/4arG5sEpqw
 
