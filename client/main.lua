@@ -1,5 +1,6 @@
-local fxContainer = {}
-local on
+local active
+local fx = 0
+local adjust = { scale = 1, r = 1, g = 3, b = 2, a = 1 }
 
 RegisterCommand('effect', function()
 
@@ -7,13 +8,14 @@ RegisterCommand('effect', function()
         subject = 'OPEN'
     })
 
-    if not on then
+    if not active then
 
-        on = true
+        active = true
 
         CreateThread(function()
 
-            while on do Wait(0)
+            while active do
+                Wait(0)
 
                 if IsControlJustReleased(0, 38) then
 
@@ -24,12 +26,19 @@ RegisterCommand('effect', function()
     end
 end)
 
+RegisterNUICallback('nuiSync', function(data, cb)
+
+    cb(adjust)
+end)
 
 RegisterNUICallback('showEffect', function(data, cb)
 
-    stopEffect()
-    msginf('stop effect', 1000)
-    Citizen.Wait(100)
+    if fx and fx ~= 0 then
+
+        stopEffect()
+        msginf('stop effect', 1000)
+        Citizen.Wait(100)
+    end
 
     effectHandler(data)
 
@@ -40,23 +49,38 @@ end)
 
 RegisterNUICallback('exit', function(data, cb)
 
+    active = false
     SetNuiFocus(false, false)
-
-    if data and data.off then
-
-        on = false
-        stopEffect()
-    end
+    stopEffect()
     cb('ok')
 end)
 
 RegisterNUICallback('timeOfDay', function(data, cb)
 
-    local command = data.timeOfDay == 'morning' and 'time 12' or 'time 1'
-    ExecuteCommand(command)
+    ExecuteCommand('time ' .. data.hour)
     cb('ok')
 end)
 
+RegisterNUICallback('changeFx', function(data, cb)
+
+    if fx and fx ~= 0 then
+
+        adjust[data.name] = data.value
+
+        if data.name == 'scale' then
+
+            SetParticleFxLoopedScale(fx, adjust['scale'] + 0.0)
+        elseif data.name == 'a' then
+
+            SetParticleFxLoopedAlpha(fx, adjust['a'] + 0.0)
+        else
+
+            SetParticleFxLoopedColour(fx, adjust['r'] + 0.0, adjust['g'] + 0.0, adjust['b'] + 0.0, 0)
+        end
+    end
+
+    cb('ok')
+end)
 
 -- NPC
 function effectHandler(data)
@@ -65,58 +89,36 @@ function effectHandler(data)
 
     local offset = GetEntityForwardVector(_PlayerPedId) * 6
     local pos = GetEntityCoords(_PlayerPedId)
-    local heading = GetEntityHeading(_PlayerPedId)
-
-    local x, y, xVector, yVector
-    local forward = {}
-    local xDistance = 4.0
-
-
-    forward.x = math.sin(math.rad(heading + 90.0))
-    forward.y = math.cos(math.rad(heading + 90.0))
-
 
     if not HasNamedPtfxAssetLoaded(data.asset) then
+
         RequestNamedPtfxAsset(data.asset)
         while not HasNamedPtfxAssetLoaded(data.asset) do
             Citizen.Wait(1)
         end
     end
 
+    SetPtfxAssetNextCall(data.asset)
 
-    for i = 1, 3 do
+    local x = pos.x + offset.x
+    local y = pos.y + offset.y
+    local _, z = GetGroundZFor_3dCoord(x, y, pos.z, 0)
 
-        SetPtfxAssetNextCall(data.asset)
-
-        x = pos.x - forward.x * (i - 2) * xDistance + offset.x
-        y = pos.y + forward.y * (i - 2) * xDistance + offset.y
-
-        local _, z = GetGroundZFor_3dCoord(x, y, pos.z, 0)
-
-
-        local fx = StartParticleFxLoopedAtCoord(data.fxName, x, y, z, 0.0, 0.0, 0.0, 0.5 * i, false, false, false, false)
-        SetParticleFxLoopedColour(fx, 1.0 + i, 3.0 - i, 1.0 + i, 0)
-        --SetParticleFxLoopedAlpha(fx, 1.0)
-
-        table.insert(fxContainer, fx)
-    end
+    fx = StartParticleFxLoopedAtCoord(data.fxName, x, y, z, 0.0, 0.0, 0.0, adjust['scale'] + 0.0, false, false, false, false)
+    SetParticleFxLoopedColour(fx, adjust['r'] + 0.0, adjust['g'] + 0.0, adjust['b'] + 0.0, 0)
+    SetParticleFxLoopedAlpha(fx, adjust['a'] + 0.0)
 end
-
 
 function stopEffect()
 
-    for _, fxHandle in pairs(fxContainer) do
+    StopParticleFxLooped(fx, 0)
 
-        StopParticleFxLooped(fxHandle, 0)
-    end
-
-    fxContainer = {}
+    fx = 0
     msginf('stop effect', 2000)
 end
 
-
-
 function msginf(msg, duree)
+
     duree = duree or 500
     ClearPrints()
     SetTextEntry_2("STRING")
@@ -124,7 +126,7 @@ function msginf(msg, duree)
     DrawSubtitleTimed(duree, 1)
 end
 
-
 function print_r(t)
+
     print(json.encode(t, { indent = true }))
 end
