@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'Ekhion'
 description 'Effect Presentation'
-version '1.0'
+version '2.0'
 
 client_scripts {
     'config.lua',
