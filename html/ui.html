@@ -1,0 +1,57 @@
+<head>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Play&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"/>
+    <link rel="stylesheet" href="styles.css" type="text/css">
+</head>
+
+<body>
+
+<div id="wrapper">
+
+    <div id="header">
+
+        <div id="day_control">
+
+            <span id="day" class="material-symbols-outlined">light_mode</span>
+            <span id="night" class="material-symbols-outlined">mode_night</span>
+        </div>
+
+        <span class="material-symbols-outlined btnClose">close</span>
+
+        <p>'E' focus ON/OFF, 'ESC' close <br> The effect copied to clipboard!</p>
+
+        <div class="searchDivContainer">
+
+            <form id="searchForm">
+
+                <input type="text" id="qInput">
+                <input type="button" id="sBtn" value="Search">
+                <input type="button" id="rBtn" value="Reset">
+            </form>
+        </div>
+    </div>
+
+    <div id="list"></div>
+
+
+</div>
+<div id="slider_container">
+    <div>SCALE:</div><div id="fx_scale_v"></div> <div class="slider" id="fx_scale"></div>
+    <div>R:</div><div id="fx_r_v"></div> <div class="slider" id="fx_r"></div>
+    <div>G:</div><div id="fx_g_v"></div> <div class="slider" id="fx_g"></div>
+    <div>B:</div><div id="fx_b_v"></div> <div class="slider" id="fx_b"></div>
+    <div>ALPHA:</div><div id="fx_a_v"></div> <div class="slider" id="fx_a"></div>
+</div>
+
+<input id="clipBoard" style="display: none;">
+
+<script src="nui://game/ui/jquery.js" type="text/javascript"></script>
+<script src="js/jquery-ui.js"></script>
+<script src="js/effects.js" type="text/javascript"></script>
+<script src="js/app.js" type="text/javascript"></script>
+
+</body>
