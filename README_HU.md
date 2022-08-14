@@ -1,9 +1,10 @@
 # ECO EFFECT
 [STANDALONE] Fivem fejlesztői szkript effektek keresésére
 
-VIDEO:
+VIDEO 1.0:
+[![promo_video](https://img.youtube.com/vi/mbmae0rCMHU/0.jpg)](https://youtu.be/mbmae0rCMHU)
 
-<a href="https://youtu.be/mbmae0rCMHU" target="_blank">![promo_video](https://img.youtube.com/vi/mbmae0rCMHU/0.jpg)</a>
+Új 2.0: állítható effekt méret és szín
 
 Discord: https://discord.gg/4arG5sEpqw
 
@@ -11,7 +12,8 @@ Funkciók:
  - kereső
  - áthelyezhető felhasználói felület
  - effektre kattintva az asset-et és a nevet vágólapra másolja
- - állítható nappal/éjszaka
+ - állítható nappal/éjszaka (time parancsot futtatja)
+ - állítható effekt méret és szín
  
 Használat:
  - /effect paranccsal indul, megjelenik a nui felület
@@ -23,5 +25,6 @@ Használat:
  Alexguirre féle listát használja
  https://gist.github.com/alexguirre/af70f0122957f005a5c12bef2618a786#file-particles-effects-dump-txt
 
-![eco_effect1](https://github.com/Ekhion76/eco_effect/blob/main/previews/eco_effect1.png)
-![eco_effect2](https://github.com/Ekhion76/eco_effect/blob/main/previews/eco_effect2.png)
+![eco_effect1](https://github.com/Ekhion76/eco_effect/blob/main/previews/eco_effect1.jpg)
+![eco_effect2](https://github.com/Ekhion76/eco_effect/blob/main/previews/eco_effect2.jpg)
+![eco_effect2](https://github.com/Ekhion76/eco_effect/blob/main/previews/eco_effect3.jpg)
