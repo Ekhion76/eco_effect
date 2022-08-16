@@ -42,16 +42,21 @@ RegisterNUICallback('showEffect', function(data, cb)
 
     effectHandler(data)
 
-    msginf('Start effect: ' .. data.fxName, 5000)
+    msginf('Start effect: ' .. data.name, 5000)
 
     cb('ok')
 end)
 
 RegisterNUICallback('exit', function(data, cb)
 
-    active = false
     SetNuiFocus(false, false)
-    stopEffect()
+
+    if data and data.stop then
+
+        active = false
+        stopEffect()
+    end
+
     cb('ok')
 end)
 
@@ -104,7 +109,7 @@ function effectHandler(data)
     local y = pos.y + offset.y
     local _, z = GetGroundZFor_3dCoord(x, y, pos.z, 0)
 
-    fx = StartParticleFxLoopedAtCoord(data.fxName, x, y, z, 0.0, 0.0, 0.0, adjust['scale'] + 0.0, false, false, false, false)
+    fx = StartParticleFxLoopedAtCoord(data.name, x, y, z, 0.0, 0.0, 0.0, adjust['scale'] + 0.0, false, false, false, false)
     SetParticleFxLoopedColour(fx, adjust['r'] + 0.0, adjust['g'] + 0.0, adjust['b'] + 0.0, 0)
     SetParticleFxLoopedAlpha(fx, adjust['a'] + 0.0)
 end
