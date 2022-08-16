@@ -1,5 +1,6 @@
 let container, qInput, qString;
 let resourceName = GetParentResourceName();
+let selected = {};
 let adjust = {};
 
 function lister() {
@@ -46,41 +47,21 @@ function lister() {
             }).appendTo(container);
 
 
-            result.forEach((fxName) => {
+            result.forEach(function (name) {
 
                 $("<li/>", {
-                    "text": fxName,
+                    "text": name,
                     "click": function () {
 
                         $('li').removeClass('act');
                         $(this).addClass('act');
 
-                        let dScale = parseFloat(adjust.scale).toFixed(1);
-                        let dr = parseFloat(adjust.r).toFixed(1);
-                        let dg = parseFloat(adjust.g).toFixed(1);
-                        let db = parseFloat(adjust.b).toFixed(1);
-                        let da = parseFloat(adjust.a).toFixed(1);
+                        selected.asset = asset;
+                        selected.name = name;
 
-                        copyToClipboard(
-                            `
-                            FOR ECO_CRAFTING AND ECO_COLLECTING:
-                            dict = '${ asset }', 
-                            name = '${ fxName }',
-                            loopedAtCoord = { 0.0, 0.0, 0.0, ${ dScale } }, -- [xRot, yRot, zRot, scale]
-                            loopedColour = { ${ dr }, ${ dg }, ${ db } }, -- [r, g, b]
-                            
-                            NATIVE:
-                            scale = ${ dScale }
-                            --SetParticleFxLoopedColour(fx, ${ dr }, ${ dg }, ${ db }, 0),
-                            --SetParticleFxLoopedAlpha(fx, ${ da })
-                            `
-                        );
+                        createClipboardData();
 
-
-                        $.post(`https://${resourceName}/showEffect`, JSON.stringify({
-                            asset: asset,
-                            fxName: fxName
-                        }));
+                        $.post(`https://${resourceName}/showEffect`, JSON.stringify(selected));
                     }
 
                 }).appendTo(parent);
@@ -91,7 +72,7 @@ function lister() {
 
 
 // Listen for NUI Events
-window.addEventListener('message', event => {
+window.addEventListener('message', function (event) {
 
     let item = event.data;
 
@@ -106,10 +87,9 @@ window.addEventListener('message', event => {
 });
 
 
-$(() => {
+$(document).ready(function () {
 
     container = $('#list');
-
 
     $('#wrapper').draggable({
         handle: '#header',
@@ -118,9 +98,7 @@ $(() => {
 
     $('#slider_container').draggable();
 
-
     $('#sBtn').click(lister);
-
 
     $('#rBtn').click(function () {
 
@@ -128,8 +106,7 @@ $(() => {
         lister();
     });
 
-
-    $(document).keypress(e => {
+    $(document).keypress(function (e) {
 
         if (e.which === 101) { // 101 - E
 
@@ -140,8 +117,7 @@ $(() => {
         }
     });
 
-
-    $('form').keypress(e => {
+    $('form').keypress(function (e) {
 
         if (e.which === 13) {
 
@@ -149,8 +125,7 @@ $(() => {
         }
     });
 
-
-    $(document).keyup(e => {
+    $(document).keyup(function (e) {
 
         if (e.which === 27) {
 
@@ -158,14 +133,13 @@ $(() => {
         }
     });
 
-
-    $('.btnClose').click(() => {
+    $('.btnClose').click(function () {
 
         close();
     });
 
 
-    $('#day').click(() => {
+    $('#day').click(function () {
 
         $.post(`https://${resourceName}/timeOfDay`, JSON.stringify({
             hour: 12
@@ -173,7 +147,7 @@ $(() => {
     });
 
 
-    $('#night').click(() => {
+    $('#night').click(function () {
 
         $.post(`https://${resourceName}/timeOfDay`, JSON.stringify({
             hour: 1
@@ -189,7 +163,7 @@ $(() => {
     let $fx_a_v = $('#fx_a_v');
 
 
-    $.post(`https://${resourceName}/nuiSync`, {}, data => {
+    $.post(`https://${resourceName}/nuiSync`, {}, function (data) {
 
         adjust = data;
 
@@ -204,16 +178,17 @@ $(() => {
             max: 5,
             step: 0.1,
             value: adjust.scale,
-            change: (event, ui) => {
+            change: function (event, ui) {
 
                 adjust.scale = ui.value;
+                createClipboardData();
 
                 $.post(`https://${resourceName}/changeFx`, JSON.stringify({
                     name: 'scale',
                     value: adjust.scale
                 }));
             },
-            slide: (event, ui) => {
+            slide: function (event, ui) {
                 $fx_scale_v.html(ui.value);
             }
         });
@@ -223,16 +198,17 @@ $(() => {
             max: 10,
             step: 0.1,
             value: adjust.r,
-            change: (event, ui) => {
+            change: function (event, ui) {
 
                 adjust.r = ui.value;
+                createClipboardData();
 
                 $.post(`https://${resourceName}/changeFx`, JSON.stringify({
                     name: 'r',
                     value: adjust.r
                 }));
             },
-            slide: (event, ui) => {
+            slide: function (event, ui) {
                 $fx_r_v.html(ui.value);
             }
         });
@@ -242,16 +218,17 @@ $(() => {
             max: 10,
             step: 0.1,
             value: adjust.g,
-            change: (event, ui) => {
+            change: function (event, ui) {
 
                 adjust.g = ui.value;
+                createClipboardData();
 
                 $.post(`https://${resourceName}/changeFx`, JSON.stringify({
                     name: 'g',
                     value: adjust.g
                 }));
             },
-            slide: (event, ui) => {
+            slide: function (event, ui) {
                 $fx_g_v.html(ui.value);
             }
         });
@@ -261,16 +238,17 @@ $(() => {
             max: 10,
             step: 0.1,
             value: adjust.b,
-            change: (event, ui) => {
+            change: function (event, ui) {
 
                 adjust.b = ui.value;
+                createClipboardData();
 
                 $.post(`https://${resourceName}/changeFx`, JSON.stringify({
                     name: 'b',
                     value: adjust.b
                 }));
             },
-            slide: (event, ui) => {
+            slide: function (event, ui) {
                 $fx_b_v.html(ui.value);
             }
         });
@@ -280,30 +258,55 @@ $(() => {
             max: 1,
             step: 0.1,
             value: adjust.a,
-            change: (event, ui) => {
+            change: function (event, ui) {
 
                 adjust.a = ui.value;
+                createClipboardData();
 
                 $.post(`https://${resourceName}/changeFx`, JSON.stringify({
                     name: 'a',
                     value: adjust.a
                 }));
             },
-            slide: (event, ui) => {
+            slide: function (event, ui) {
                 $fx_a_v.html(ui.value);
             }
         });
     });
 });
 
-
 function close() {
 
     $('#wrapper').css("display", "none");
     $('#slider_container').css("display", "none");
-    $.post(`https://${resourceName}/exit`);
+    $.post(`https://${resourceName}/exit`, JSON.stringify({
+        stop: true
+    }));
 }
 
+function createClipboardData() {
+
+    let dScale = parseFloat(adjust.scale).toFixed(1);
+    let dr = parseFloat(adjust.r).toFixed(1);
+    let dg = parseFloat(adjust.g).toFixed(1);
+    let db = parseFloat(adjust.b).toFixed(1);
+    let da = parseFloat(adjust.a).toFixed(1);
+
+    copyToClipboard(
+        `
+        FOR ECO_CRAFTING AND ECO_COLLECTING:
+        dict = '${ selected.asset }', 
+        name = '${ selected.name }',
+        loopedAtCoord = { 0.0, 0.0, 0.0, ${ dScale } }, -- [xRot, yRot, zRot, scale]
+        loopedColour = { ${ dr }, ${ dg }, ${ db } }, -- [r, g, b]
+        
+        NATIVE:
+        scale = ${ dScale }
+        --SetParticleFxLoopedColour(fx, ${ dr }, ${ dg }, ${ db }, 0),
+        --SetParticleFxLoopedAlpha(fx, ${ da })
+        `
+    );
+}
 
 function copyToClipboard(string) {
     let $temp = $("<textarea>");
@@ -312,5 +315,3 @@ function copyToClipboard(string) {
     document.execCommand("copy");
     $temp.remove();
 }
-
-
