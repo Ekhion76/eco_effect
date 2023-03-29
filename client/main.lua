@@ -70,7 +70,8 @@ end)
 
 RegisterNUICallback('timeOfDay', function(data, cb)
 
-    ExecuteCommand('time ' .. data.hour)
+    NetworkOverrideClockTime(data.hour, 0, 0)
+    --ExecuteCommand('time ' .. data.hour)
     cb('ok')
 end)
 
