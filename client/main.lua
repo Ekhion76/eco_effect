@@ -5,8 +5,8 @@ local adjust = { scale = 1, r = 1, g = 3, b = 2, a = 1 }
 RegisterCommand('effect', function()
 
     SendNUIMessage({
-        subject = 'OPEN'
-    })
+                       subject = 'OPEN'
+                   })
 
     if not active then
 
@@ -55,11 +55,11 @@ RegisterNUICallback('exit', function(data, cb)
 
     SetNuiFocus(false, false)
 
-    DisableIdleCamera(false)
-    SetPedCanPlayAmbientAnims(PlayerPedId(), true)
-    SetResourceKvp("idleCam", "on")
-
     if data and data.stop then
+
+        DisableIdleCamera(false)
+        SetPedCanPlayAmbientAnims(PlayerPedId(), true)
+        SetResourceKvp("idleCam", "on")
 
         active = false
         stopEffect()
