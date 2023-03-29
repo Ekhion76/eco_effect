@@ -6,7 +6,6 @@ description 'Effect Presentation'
 version '2.1'
 
 client_scripts {
-    'config.lua',
     'client/main.lua'
 }
 
