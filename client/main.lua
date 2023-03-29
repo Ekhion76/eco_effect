@@ -12,6 +12,10 @@ RegisterCommand('effect', function()
 
         active = true
 
+        DisableIdleCamera(true)
+        SetPedCanPlayAmbientAnims(PlayerPedId(), false)
+        SetResourceKvp("idleCam", "off")
+
         CreateThread(function()
 
             while active do
@@ -50,6 +54,10 @@ end)
 RegisterNUICallback('exit', function(data, cb)
 
     SetNuiFocus(false, false)
+
+    DisableIdleCamera(false)
+    SetPedCanPlayAmbientAnims(PlayerPedId(), true)
+    SetResourceKvp("idleCam", "on")
 
     if data and data.stop then
 
