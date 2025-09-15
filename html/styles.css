@@ -82,17 +82,14 @@ a {
 }
 
 a:hover, .active {
-
     background: #ff271a !important;
 }
 
 li:hover {
-
     text-decoration: underline;
 }
 
 .btnClose {
-
     border: none;
     font-size: 1.0em;
     margin: 10px 0;
@@ -109,11 +106,11 @@ li:hover {
 
 /* SLIDER */
 #slider_container {
-    position: absolute;
-    left: 20px;
-    top: 100px;
+    position: fixed;
+    left: calc(50% - 250px);
+    top: calc(90vh - 200px);
     width: 500px;
-    margin:auto;
+    margin: 0;
     text-align: center;
     display: none;
     grid-template-columns: 0.1fr 0.1fr 0.9fr;
@@ -123,7 +120,9 @@ li:hover {
     box-shadow: 0 8px 32px 0 rgba(19, 19, 19, 0.37);
     padding: 10px 20px;
     border-radius: 8px;
+    z-index: 9999;
 }
+
 .slider {
     margin: 10px 0;
 }
