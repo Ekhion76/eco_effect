@@ -3,152 +3,197 @@ let resourceName = GetParentResourceName();
 let selected = {};
 let adjust = {};
 
-function lister() {
+let cachedEffects = [];
+let visibleEffects = [];
+let effectLoadTimeout = null;
 
-    container.empty();
-
-    qString = qInput.val().toLowerCase();
-
+function buildCachedEffects() {
+    cachedEffects = [];
     $.each(effects, function (asset, fxNameArray) {
-
-        let result = [];
-
-        if (qString.length > 0) {
-
-            result = fxNameArray.filter(c => {
-                return c.includes(qString)
-            });
-        } else {
-
-            result = fxNameArray;
-        }
-
-
-        if (result.length > 0) {
-
-            $("<a/>", {
-                "text": asset,
-                "href": '#',
-                "class": `no_href`,
-                "click": function () {
-
-                    let $this = $(this);
-
-                    $(`.parent_${ asset }`).slideToggle(200, function () {
-                        $this.toggleClass('ulClose')
-                    });
-                    return false;
-                }
-            }).appendTo(container); // append if recipes not 0 (authItems == true)
-
-
-            parent = $("<ul/>", {
-                "class": `parent_${ asset }`,
-            }).appendTo(container);
-
-
-            result.forEach(function (name) {
-
-                $("<li/>", {
-                    "text": name,
-                    "click": function () {
-
-                        $('li').removeClass('act');
-                        $(this).addClass('act');
-
-                        selected.asset = asset;
-                        selected.name = name;
-
-                        createClipboardData();
-
-                        $.post(`https://${resourceName}/showEffect`, JSON.stringify(selected));
-                    }
-
-                }).appendTo(parent);
-            });
-        }
+        fxNameArray.forEach(name => {
+            cachedEffects.push({ asset, name });
+        });
     });
 }
 
+function lister() {
+    container.empty();
+    qString = qInput.val().toLowerCase();
 
-// Listen for NUI Events
+    visibleEffects = [];
+
+    // Csoportosítva, de csak a szűrt elemek
+    $.each(effects, function (asset, fxNameArray) {
+        let filtered = qString.length > 0
+            ? fxNameArray.filter(c => c.toLowerCase().includes(qString))
+            : fxNameArray;
+
+        if (filtered.length === 0) return;
+
+        // Cím (asset)
+        let $assetLink = $("<a/>", {
+            text: asset,
+            href: '#',
+            class: `no_href`,
+            click: function () {
+                $(`.parent_${ asset }`).slideToggle(200);
+                $(this).toggleClass('ulClose');
+                return false;
+            }
+        }).appendTo(container);
+
+        // Lista
+        let $parent = $("<ul/>", {
+            class: `parent_${ asset }`,
+        }).appendTo(container);
+
+        filtered.forEach(function (name) {
+            visibleEffects.push({ asset, name });
+
+            $("<li/>", {
+                text: name,
+                class: (selected.asset === asset && selected.name === name) ? 'act' : '',
+                click: function () {
+                    $('li').removeClass('act');
+                    $(this).addClass('act');
+
+                    selected.asset = asset;
+                    selected.name = name;
+
+                    createClipboardData();
+
+                    $.post(`https://${resourceName}/showEffect`, JSON.stringify(selected));
+                }
+            }).appendTo($parent);
+        });
+    });
+}
+
+// Arrow navigation
+function selectEffectByIndex(index) {
+    if (visibleEffects.length === 0) return;
+
+    if (index < 0) index = visibleEffects.length - 1;
+    if (index >= visibleEffects.length) index = 0;
+
+    selected = visibleEffects[index];
+
+    $('li').removeClass('act');
+
+    $(`.parent_${selected.asset} li`).each(function () {
+        if ($(this).text() === selected.name) {
+            $(this).addClass('act');
+
+            let containerHeight = container.height();
+            let containerScrollTop = container.scrollTop();
+            let itemTop = $(this).position().top;
+            let itemHeight = $(this).outerHeight();
+
+            let newScrollTop = containerScrollTop + itemTop - (containerHeight / 2) + (itemHeight / 2);
+            container.scrollTop(newScrollTop);
+
+            return false;
+        }
+    });
+
+    createClipboardData();
+
+    // Debounce effect
+    if (effectLoadTimeout) {
+        clearTimeout(effectLoadTimeout);
+    }
+    effectLoadTimeout = setTimeout(() => {
+        $.post(`https://${resourceName}/showEffect`, JSON.stringify(selected));
+        effectLoadTimeout = null;
+    }, 250); // 250 ms delay
+}
+
+function getSelectedIndex() {
+    for (let i = 0; i < visibleEffects.length; i++) {
+        if (visibleEffects[i].asset === selected.asset && visibleEffects[i].name === selected.name) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 window.addEventListener('message', function (event) {
-
     let item = event.data;
 
     if (item.subject === 'OPEN') {
-
         $('#wrapper').css("display", "block");
         $('#slider_container').css("display", "grid");
 
         qInput = $('#qInput');
+        buildCachedEffects();
         lister();
     }
 });
 
-
 $(document).ready(function () {
-
     container = $('#list');
 
-    $('#wrapper').draggable({
-        handle: '#header',
-        containment: 'parent'
-    });
-
+    $('#wrapper').draggable({ handle: '#header', containment: 'parent' });
     $('#slider_container').draggable();
 
     $('#sBtn').click(lister);
-
     $('#rBtn').click(function () {
-
         qInput.val('');
         lister();
     });
 
-    $(document).keypress(function (e) {
+    // Nyíl navigáció
+    $(document).keydown(function (e) {
+        if ($('#wrapper').css('display') === 'none') return;
 
-        if (e.which === 101) { // 101 - E
+        if (e.which === 38 || e.which === 40) { // fel vagy le nyíl
+            e.preventDefault();
 
-            if (e.target.nodeName !== 'INPUT') {
+            let currentIndex = getSelectedIndex();
+            if (currentIndex === -1 && visibleEffects.length > 0) {
+                currentIndex = 0;
+            } else {
+                currentIndex += (e.which === 38) ? -1 : 1;
 
-                $.post(`https://${resourceName}/exit`);
+                if (currentIndex < 0) {
+                    currentIndex = visibleEffects.length - 1;
+                } else if (currentIndex >= visibleEffects.length) {
+                    currentIndex = 0;
+                }
+            }
+            selectEffectByIndex(currentIndex);
+        } else if (e.which === 32) { // space
+            e.preventDefault();
+
+            if (selected.asset && selected.name) {
+                $.post(`https://${resourceName}/showEffect`, JSON.stringify(selected));
             }
         }
     });
 
-    $('form').keypress(function (e) {
-
-        if (e.which === 13) {
-
-            e.preventDefault();
+    $(document).keypress(function (e) {
+        if (e.which === 101 && e.target.nodeName !== 'INPUT') { // E
+            $.post(`https://${resourceName}/exit`);
         }
+    });
+
+    $('form').keypress(function (e) {
+        if (e.which === 13) e.preventDefault();
     });
 
     $(document).keyup(function (e) {
-
-        if (e.which === 27) {
-
-            close();
-        }
+        if (e.which === 27) close();
     });
 
-    $('.btnClose').click(function () {
-
-        close();
-    });
-
+    $('.btnClose').click(close);
 
     $('#day').click(function () {
-
         $.post(`https://${resourceName}/timeOfDay`, JSON.stringify({
             hour: 12
         }));
     });
 
-
     $('#night').click(function () {
-
         $.post(`https://${resourceName}/timeOfDay`, JSON.stringify({
             hour: 1
         }));
@@ -276,7 +321,6 @@ $(document).ready(function () {
 });
 
 function close() {
-
     $('#wrapper').css("display", "none");
     $('#slider_container').css("display", "none");
     $.post(`https://${resourceName}/exit`, JSON.stringify({
@@ -285,7 +329,6 @@ function close() {
 }
 
 function createClipboardData() {
-
     let dScale = parseFloat(adjust.scale).toFixed(1);
     let dr = parseFloat(adjust.r).toFixed(1);
     let dg = parseFloat(adjust.g).toFixed(1);
